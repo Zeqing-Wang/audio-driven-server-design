@@ -23,7 +23,10 @@ def post_test():
     if request.method == 'POST':
         # app.logger.info("Received ",str(request))
         post_data = request.get_json()
-        # app.logger.info("Received post_data",post_data.get('sn'))
+        style_value = post_data['style_value'].get('_value')
+        id_value = post_data['id_value'].get('_value')
+        text = post_data['text'].get('_value')
+        app.logger.info("Received post_data: style_value: {0}; id_value: {1}; text: {2}".format(style_value, id_value, text))
         # RESOURCES = []
         # RESOURCES.append({
         #     'sn': post_data.get('sn'),
