@@ -4,8 +4,8 @@ from flask_cors import *
 import os
 from urllib.parse import urljoin
 import uuid
-
-app = Flask(__name__)
+from inference import inference
+app = Flask(__name__, static_folder='videos')
 CORS(app, supports_credentials=True)
 
 # 进行一系列后端限制
@@ -74,14 +74,23 @@ def post_upload():
     app.logger.info("Received Post Data Form!")
     if request.method == 'POST':
         file = request.files.get('file')
+        style_value = request.form.get('style_value')
+        id_value = request.form.get('id_value')
+        text = request.form.get('text')
+        app.logger.info("Received post_data: style_value: {0}; id_value: {1}; text: {2}".format(style_value, id_value, text))
+        # print('json_file', json_file)
         if file and allowed_file(file.filename):
             print(file.filename)
             filename = random_filename(file.filename)
             filepath = os.path.join(UPLOAD_FOLDER, filename)
             file.save(os.path.join(app.root_path, filepath))
-            file_url = urljoin(request.host_url, filepath)
-            print('url:',file_url)
-        return 'ok'
+            audio_path = urljoin(request.host_url, filepath)
+            print('audio_path:',audio_path)
+            result_url = inference(style_value=style_value, id_value=id_value, text=text, audio_path=audio_path)
+            # return 1000
+            return {"code":1000, "result_url":result_url}
+        else:
+            return 2001
     else:
         return 'bad'
 
